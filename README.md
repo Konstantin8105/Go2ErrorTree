@@ -4,6 +4,8 @@
 
 Error-tree created in according to [repository](https://github.com/Konstantin8105/errors).
 
+Error-tree help to grouping the errors.
+
 Let's suppose on example:
 ```go
 func printSum(a, b string) error {
@@ -119,7 +121,7 @@ func CopyFile(src, dst string) error {
 	}
 
 	if _, err := io.Copy(w, r); err != nil {
-		er.Add(err)
+		et.Add(err)
 		et.Add(w.Close())
 		et.Add(os.Remove(dst))
 		return et
@@ -128,6 +130,55 @@ func CopyFile(src, dst string) error {
 	if err := w.Close(); err != nil {
 		et.Add(err)
 		et.Add(os.Remove(dst))
+		return et
+	}
+
+	return nil
+}
+```
+
+Rewrite with `errorhandling`:
+```go
+
+func CopyFile(src, dst string) error {
+	// create error tree
+	et := errors.New("CopyFile")
+	defer func() {
+		if et.IsError() {
+			er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
+		} else {
+			err = nil
+		}
+	}()
+	r, err := os.Open(src)
+	if err != nil {
+		et.Add(err)
+		return et
+	}
+	defer func() {
+		et.Add(r.Close())
+	}()
+
+	w, err := os.Create(dst)
+	if err != nil {
+		et.Add(err)
+		return et
+	}
+
+	if _, err := io.Copy(w, r); err != nil {
+		errorhandling(et) {
+			et = err
+			et = w.Close()
+			et = os.Remove(dst)
+		}
+		return et
+	}
+
+	if err := w.Close(); err != nil {
+		errorhandling(et) {
+			et = err
+			et = os.Remove(dst)
+		}
 		return et
 	}
 
