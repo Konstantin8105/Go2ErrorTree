@@ -94,43 +94,43 @@ func CopyFile(src, dst string) error {
 Rewrite in according to error-tree approach:
 ```go
 func CopyFile(src, dst string) error {
-  // create error tree
-  et := errors.New("CopyFile")
-  defer func() {
-    if et.IsError() {
-      er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
-    } else {
-      err = nil
-    }
-  }()
+	// create error tree
+	et := errors.New("CopyFile")
+	defer func() {
+		if et.IsError() {
+			er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
+		} else {
+			err = nil
+		}
+	}()
 	r, err := os.Open(src)
 	if err != nil {
 		et.Add(err)
-    return et
+		return et
 	}
-	defer func(){
-    et.Add(r.Close())
-  }()
+	defer func() {
+		et.Add(r.Close())
+	}()
 
 	w, err := os.Create(dst)
 	if err != nil {
-    et.Add(err)
-    return et
+		et.Add(err)
+		return et
 	}
 
 	if _, err := io.Copy(w, r); err != nil {
-    er.Add(err)
+		er.Add(err)
 		et.Add(w.Close())
-		et.Add(os.Remove(dst))
-    return et
-	}
-
-	if err := w.Close(); err != nil {
-    et.Add(err)
 		et.Add(os.Remove(dst))
 		return et
 	}
-  
-  return nil
+
+	if err := w.Close(); err != nil {
+		et.Add(err)
+		et.Add(os.Remove(dst))
+		return et
+	}
+
+	return nil
 }
 ```
