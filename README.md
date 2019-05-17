@@ -7,7 +7,7 @@ Error-tree created in according to [repository](https://github.com/Konstantin810
 Error-tree help to grouping the errors.
 
 Let's suppose on example:
-```go
+```
 func printSum(a, b string) error {
   x, err := strconv.Atoi(a)
   if err != nil {
@@ -24,7 +24,7 @@ func printSum(a, b string) error {
 
 Add exist error-tree.
 
-```go
+```
 func printSum(a, b string) error {
   // create error tree
   et := errors.New("check input data")
@@ -65,7 +65,7 @@ func printSum(a, b string) error {
 ```
 
 Now, we take next example:
-```go
+```
 func CopyFile(src, dst string) error {
 	r, err := os.Open(src)
 	if err != nil {
@@ -94,7 +94,7 @@ func CopyFile(src, dst string) error {
 ```
 
 Rewrite in according to error-tree approach:
-```go
+```
 func CopyFile(src, dst string) error {
 	// create error tree
 	et := errors.New("CopyFile")
@@ -139,7 +139,6 @@ func CopyFile(src, dst string) error {
 
 Rewrite with `errorhandling`:
 ```go
-
 func CopyFile(src, dst string) error {
 	// create error tree
 	et := errors.New("CopyFile")
@@ -188,7 +187,7 @@ func CopyFile(src, dst string) error {
 
 Example of **Walking by error-tree** taked from [git](https://github.com/Konstantin8105/errors):
 
-```go
+```golang
 type ErrorValue struct {
 	ValueName string
 	Reason    error
