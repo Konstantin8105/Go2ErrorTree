@@ -61,3 +61,76 @@ func printSum(a, b string) error {
   return nil
 }
 ```
+
+Now, we take next example:
+```go
+func CopyFile(src, dst string) error {
+	r, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("copy %s %s: %v", src, dst, err)
+	}
+	defer r.Close()
+
+	w, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("copy %s %s: %v", src, dst, err)
+	}
+
+	if _, err := io.Copy(w, r); err != nil {
+		w.Close()
+		os.Remove(dst)
+		return fmt.Errorf("copy %s %s: %v", src, dst, err)
+	}
+
+	if err := w.Close(); err != nil {
+		os.Remove(dst)
+		return fmt.Errorf("copy %s %s: %v", src, dst, err)
+	}
+  
+  return nil
+}
+```
+
+Rewrite in according to error-tree approach:
+```go
+func CopyFile(src, dst string) error {
+  // create error tree
+  et := errors.New("CopyFile")
+  defer func() {
+    if et.IsError() {
+      er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
+    } else {
+      err = nil
+    }
+  }()
+	r, err := os.Open(src)
+	if err != nil {
+		et.Add(err)
+    return et
+	}
+	defer func(){
+    et.Add(r.Close())
+  }()
+
+	w, err := os.Create(dst)
+	if err != nil {
+    et.Add(err)
+    return et
+	}
+
+	if _, err := io.Copy(w, r); err != nil {
+    er.Add(err)
+		et.Add(w.Close())
+		et.Add(os.Remove(dst))
+    return et
+	}
+
+	if err := w.Close(); err != nil {
+    et.Add(err)
+		et.Add(os.Remove(dst))
+		return et
+	}
+  
+  return nil
+}
+```
