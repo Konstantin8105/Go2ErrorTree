@@ -14,10 +14,10 @@ errorhandling(et interface(){ Add(error) }){
 	val1, et = function1()
 	val2, et = function2(val1)
 	val3, val4, et = function3()
-} | // none
+}
 ```
 
-Internal interpretation:
+Internal interpretation `errorhandling`:
 ```
 { var errLocal error; val1, errLocal = function1(); et.Add(errLocal) }
 { var errLocal error; val2, errLocal = function2(val1); et.Add(errLocal) }
