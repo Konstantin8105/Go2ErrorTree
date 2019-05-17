@@ -113,12 +113,12 @@ func CopyFile(src, dst string) error {
 
 Rewrite in according to error-tree approach:
 ```
-func CopyFile(src, dst string) error {
+func CopyFile(src, dst string) (err error) {
 	// create error tree
 	et := errors.New("CopyFile")
 	defer func() {
 		if et.IsError() {
-			er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
+			er.Add(fmt.Errorf("copy %s %s", src, dst))
 		} else {
 			err = nil
 		}
@@ -157,12 +157,12 @@ func CopyFile(src, dst string) error {
 
 Rewrite with `errorhandling`:
 ```go
-func CopyFile(src, dst string) error {
+func CopyFile(src, dst string) (err error) {
 	// create error tree
 	et := errors.New("CopyFile")
 	defer func() {
 		if et.IsError() {
-			er.Add(fmt.Errorf("copy %s %s: %v", src, dst, err))
+			er.Add(fmt.Errorf("copy %s %s", src, dst))
 		} else {
 			err = nil
 		}
@@ -202,6 +202,8 @@ func CopyFile(src, dst string) error {
 	return nil
 }
 ```
+
+If we have a tree, then we have to add function for moving by tree as `go.ast.Walk`.
 
 Example of **Walking by error-tree** taked from [git](https://github.com/Konstantin8105/errors):
 
