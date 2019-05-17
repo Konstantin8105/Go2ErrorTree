@@ -6,6 +6,16 @@ Error-tree created in according to [repository](https://github.com/Konstantin810
 
 Error-tree help to grouping the errors.
 
+Description of new language element `errorhandling`:
+
+Go code | Internal interpretation
+----- | -----
+errorhandling(et interface(){ Add(error) }){  | // none
+	val1, et = function1()                |  { var errLocal error; val1, errLocal = function1(); et.Add(errLocal) }
+	val2, et = function2()    | { var errLocal error; val2, errLocal = function2(); et.Add(errLocal) }
+	val3, val4, et = function3()  | { var errLocal error; val3, val4, errLocal = function3(); et.Add(errLocal) }
+}    | // none
+
 Let's suppose on example:
 ```
 func printSum(a, b string) error {
