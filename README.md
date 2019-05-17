@@ -42,3 +42,22 @@ func printSum(a, b string) error {
   return nil
 }
 ```
+
+And writing it as:
+
+```go
+func printSum(a, b string) error {
+  // create error tree
+  et := errors.New("check input data")
+  errorhandling(et interface{Add(error)}){ // add type just for clearification
+    x, et := strconv.Atoi(a)
+    y, et := strconv.Atoi(b)
+  }
+  // is error-tree have errors
+  if et.IsError() {
+    return et
+  }
+  fmt.Println("result:", x + y)
+  return nil
+}
+```
